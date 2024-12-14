@@ -92,6 +92,15 @@ For larger or more time-intensive changes, you're welcome to outline your ideas 
 
 _When all the behaviour is implemented, feel free to add some observations or conclusions you like to share in the section_
 
+The structure of the project should have a pattern. Atomic design would be a possible.
+
+The CSS pattern like Bliss would improve the style readibility.
+
+The backend should also have a clear separation of concerns:
+- controller layer
+- service layer
+- DAO layer
+
 ### Database structure
 
 #### Hotels Collection
