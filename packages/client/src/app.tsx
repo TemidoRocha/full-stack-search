@@ -1,20 +1,11 @@
-import { useEffect, useState, type ChangeEvent } from 'react';
+import { useState, type ChangeEvent } from 'react';
+import { Link } from 'react-router-dom';
 // import { getCodeSandboxHost } from "@codesandbox/utils";
 
 type Hotel = { _id: string, chain_name: string; hotel_name: string; city: string, country: string };
 
 // const codeSandboxHost = getCodeSandboxHost(3001)
 const API_URL = "https://ubiquitous-winner-q4x647rqp4jfxpvj-3001.app.github.dev" // codeSandboxHost ? `https://${codeSandboxHost}` : 'http://localhost:3001'
-
-const connectDB = async () => {
-  await fetch(`${API_URL}/connect`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    }
-  })
-}
 
 const fetchAndFilterHotels = async (value: string) => {
   const hotelsData = await fetch(`${API_URL}/hotels`, {
@@ -35,13 +26,15 @@ const fetchAndFilterHotels = async (value: string) => {
 }
 
 function App() {
+  const [searchValue, setSearchValue] = useState('');
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [showClearBtn, setShowClearBtn] = useState(false);
 
   const fetchData = async (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+
     if (event.target.value === '') {
-      setHotels([]);
-      setShowClearBtn(false);
+      resetData();
       return;
     }
 
@@ -50,9 +43,11 @@ function App() {
     setHotels(filteredHotels);
   };
 
-  useEffect(() => {
-    connectDB();
-  })
+  const resetData = () => {
+    searchValue && setSearchValue("");
+    setHotels([]);
+    setShowClearBtn(false);
+  }
 
   return (
     <div className="App">
@@ -66,11 +61,12 @@ function App() {
                   type="text"
                   className="form-control form-input"
                   placeholder="Search accommodation..."
+                  value={searchValue}
                   onChange={fetchData}
                 />
                 {showClearBtn && (
                   <span className="left-pan">
-                    <i className="fa fa-close"></i>
+                    <i className="fa fa-close" onClick={resetData}></i>
                   </span>
                 )}
               </div>
@@ -79,30 +75,30 @@ function App() {
                   <h2>Hotels</h2>
                   {hotels.length ? hotels.map((hotel, index) => (
                     <li key={index}>
-                      <a href={`/hotels/${hotel._id}`} className="dropdown-item">
+                      <Link to={`/hotels/${hotel.hotel_name}`} className="dropdown-item">
                         <i className="fa fa-building mr-2"></i>
                         {hotel.hotel_name}
-                      </a>
+                      </Link>
                       <hr className="divider" />
                     </li>
                   )) : <p>No hotels matched</p>}
                   <h2>Countries</h2>
                   {hotels.length ? hotels.map((hotel, index) => (
                     <li key={index}>
-                      <a href={`/hotels/${hotel._id}`} className="dropdown-item">
+                      <Link to={`/countries/${hotel.country}`} className="dropdown-item">
                         <i className="fa fa-building mr-2"></i>
                         {hotel.country}
-                      </a>
+                      </Link>
                       <hr className="divider" />
                     </li>
                   )) : <p>No countries matched</p>}
                   <h2>Cities</h2>
                   {hotels.length ? hotels.map((hotel, index) => (
                     <li key={index}>
-                      <a href={`/hotels/${hotel._id}`} className="dropdown-item">
+                      <Link to={`/cities/${hotel.city}`} className="dropdown-item">
                         <i className="fa fa-building mr-2"></i>
                         {hotel.city}
-                      </a>
+                      </Link>
                       <hr className="divider" />
                     </li>
                   )) : <p>No cities matched</p>}

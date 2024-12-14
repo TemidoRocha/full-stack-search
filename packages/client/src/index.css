@@ -54,6 +54,7 @@ body {
 
 .left-pan {
   padding-left: 7px;
+  cursor: pointer;
 }
 
 .left-pan i {
