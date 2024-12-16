@@ -34,7 +34,7 @@ app.get('/hotels', async (req, res) => {
   }
 })
 
-app.get('/hotels/filter/:value', async (req, res) => {
+app.get('/search/:value', async (req, res) => {
   const { value } = req.params;
   if (!value) {
     throw new Error("Query parameter 'value' is required.");
@@ -47,19 +47,34 @@ app.get('/hotels/filter/:value', async (req, res) => {
     await mongoClient.connect();
     console.log('Successfully connected to MongoDB!');
     const db = mongoClient.db()
-    const collection = db.collection('hotels');
-    
+
     const regex = new RegExp(value, "i");
-    const query = {
+    
+    const hotelsCollection = db.collection('hotels');
+    const hotels = await hotelsCollection.find({
       $or: [
         { chain_name: regex },
         { hotel_name: regex },
-        { city: regex },
         { country: regex }
       ]
-    };
+    }).toArray()
 
-    res.send(await collection.find(query).toArray())
+    const countriesCollection = db.collection('countries');
+    const countries = await countriesCollection.find({
+      $or: [
+        { country: regex }
+      ]
+    }).toArray()
+
+    const citiesCollection = db.collection('cities');
+    const cities = await citiesCollection.find({
+      $or: [
+        { name: regex }
+      ]
+    }).toArray()
+
+
+    res.send({ hotels, countries, cities })
   } finally {
     await mongoClient.close();
   }
